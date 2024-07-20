@@ -11,24 +11,23 @@ data class MusicShelfRenderer(
 ) {
     @Serializable
     data class Content(
-        val musicResponsiveListItemRenderer: MusicResponsiveListItemRenderer?,
+        val musicResponsiveListItemRenderer: MusicResponsiveListItemRenderer?
     ) {
         val runs: Pair<List<Runs.Run>, List<List<Runs.Run>>>
-            get() = (musicResponsiveListItemRenderer
+            get() = musicResponsiveListItemRenderer
                 ?.flexColumns
                 ?.firstOrNull()
                 ?.musicResponsiveListItemFlexColumnRenderer
                 ?.text
                 ?.runs
-                ?: emptyList()) to
-                    (musicResponsiveListItemRenderer
+                .orEmpty() to
+                    musicResponsiveListItemRenderer
                         ?.flexColumns
-                        ?.lastOrNull()
+                        ?.let { it.getOrNull(1) ?: it.lastOrNull() }
                         ?.musicResponsiveListItemFlexColumnRenderer
                         ?.text
                         ?.splitBySeparator()
-                        ?: emptyList()
-                            )
+                        .orEmpty()
 
         val thumbnail: Thumbnail?
             get() = musicResponsiveListItemRenderer

@@ -79,7 +79,6 @@ object Innertube {
             val Album = SearchFilter("EgWKAQIYAWoKEAkQChAFEAMQBA%3D%3D")
             val Artist = SearchFilter("EgWKAQIgAWoKEAkQChAFEAMQBA%3D%3D")
             val CommunityPlaylist = SearchFilter("EgeKAQQoAEABagoQAxAEEAoQCRAF")
-            val FeaturedPlaylist = SearchFilter("EgeKAQQoADgBagwQDhAKEAMQBRAJEAQ%3D")
         }
     }
 
