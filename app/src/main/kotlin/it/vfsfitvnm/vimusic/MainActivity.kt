@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
+import android.window.OnBackInvokedDispatcher
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material.ripple.RippleTheme
@@ -44,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -53,9 +55,12 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.core.os.BuildCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.Log
+import androidx.media3.common.util.UnstableApi
 import com.valentinilk.shimmer.LocalShimmerTheme
 import com.valentinilk.shimmer.defaultShimmerTheme
 import it.vfsfitvnm.compose.persist.PersistMap
@@ -120,12 +125,22 @@ class MainActivity : ComponentActivity(), PersistMapOwner {
 
     override fun onStart() {
         super.onStart()
+        startService(Intent(this, PlayerService::class.java))
         bindService(intent<PlayerService>(), serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
+    @ExperimentalComposeUiApi
     @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (BuildCompat.isAtLeastT()) {
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT
+            ) {
+                Log.d("onBackPress", "does it work?")
+            }
+        }
 
         @Suppress("DEPRECATION", "UNCHECKED_CAST")
         persistMap = lastCustomNonConfigurationInstance as? PersistMap ?: PersistMap()

@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,6 +33,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,6 +66,7 @@ import it.vfsfitvnm.vimusic.ui.styling.collapsedPlayerProgressBar
 import it.vfsfitvnm.vimusic.ui.styling.px
 import it.vfsfitvnm.vimusic.utils.DisposableListener
 import it.vfsfitvnm.vimusic.utils.forceSeekToNext
+import it.vfsfitvnm.vimusic.utils.forceSeekToPrevious
 import it.vfsfitvnm.vimusic.utils.isLandscape
 import it.vfsfitvnm.vimusic.utils.positionAndDurationState
 import it.vfsfitvnm.vimusic.utils.seamlessPlay
@@ -72,6 +76,8 @@ import it.vfsfitvnm.vimusic.utils.shouldBePlaying
 import it.vfsfitvnm.vimusic.utils.thumbnail
 import it.vfsfitvnm.vimusic.utils.toast
 import kotlin.math.absoluteValue
+import it.vfsfitvnm.vimusic.ui.components.SeekBar
+import androidx.activity.OnBackPressedCallback
 
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
@@ -81,7 +87,6 @@ fun Player(
     modifier: Modifier = Modifier,
 ) {
     val menuState = LocalMenuState.current
-
     val (colorPalette, typography, thumbnailShape) = LocalAppearance.current
     val binder = LocalPlayerServiceBinder.current
 
@@ -112,11 +117,8 @@ fun Player(
     }
 
     val mediaItem = nullableMediaItem ?: return
-
     val positionAndDuration by binder.player.positionAndDurationState()
-
     val windowInsets = WindowInsets.systemBars
-
     val horizontalBottomPaddingValues = windowInsets
         .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom).asPaddingValues()
 
@@ -160,7 +162,7 @@ fun Player(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .height(Dimensions.collapsedPlayer)
-                ) {
+                ){
                     AsyncImage(
                         model = mediaItem.mediaMetadata.artworkUri.thumbnail(Dimensions.thumbnails.song.px),
                         contentDescription = null,
@@ -182,12 +184,16 @@ fun Player(
                         style = typography.xs.semiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .padding(vertical = 2.dp)
                     )
                     BasicText(
                         text = mediaItem.mediaMetadata.artist?.toString() ?: "",
                         style = typography.xs.semiBold.secondary,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .padding(vertical = 2.dp)
                     )
                 }
 
@@ -221,6 +227,15 @@ fun Player(
                     )
 
                     IconButton(
+                        icon = R.drawable.play_skip_back,
+                        color = colorPalette.text,
+                        onClick = binder.player::forceSeekToPrevious,
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp, vertical = 8.dp)
+                            .size(20.dp)
+                    )
+
+                    IconButton(
                         icon = R.drawable.play_skip_forward,
                         color = colorPalette.text,
                         onClick = binder.player::forceSeekToNext,
@@ -229,11 +244,6 @@ fun Player(
                             .size(20.dp)
                     )
                 }
-
-                Spacer(
-                    modifier = Modifier
-                        .width(2.dp)
-                )
             }
         }
     ) {
@@ -300,18 +310,24 @@ fun Player(
                     )
                 }
 
-                controlsContent(
+                Column(
                     modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .fillMaxHeight()
                         .weight(1f)
-                )
+                        .padding(vertical = 8.dp)
+                ) {
+                    controlsContent(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.Start)
+                    )
+                    Spacer(modifier = Modifier.height(18.dp))
+                }
             }
         } else {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = containerModifier
-                    .padding(top = 54.dp)
+                    .padding(top = 240.dp)
             ) {
                 Box(
                     contentAlignment = Alignment.Center,
@@ -320,19 +336,24 @@ fun Player(
                 ) {
                     thumbnailContent(
                         modifier = Modifier
-                            .padding(horizontal = 32.dp, vertical = 8.dp)
+                            .padding(horizontal = 24.dp, vertical = 8.dp)
                     )
                 }
 
-                controlsContent(
+                Column(
                     modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .fillMaxWidth()
                         .weight(1f)
-                )
+                        .padding(vertical = 8.dp)
+                ) {
+                    controlsContent(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.Start)
+                    )
+                    Spacer(modifier = Modifier.height(18.dp))
+                }
             }
         }
-
 
         Queue(
             layoutState = playerBottomSheetState,

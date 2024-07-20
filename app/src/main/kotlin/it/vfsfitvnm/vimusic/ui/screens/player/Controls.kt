@@ -4,10 +4,10 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,8 +16,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.border
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,11 +50,11 @@ import it.vfsfitvnm.vimusic.utils.bold
 import it.vfsfitvnm.vimusic.utils.forceSeekToNext
 import it.vfsfitvnm.vimusic.utils.forceSeekToPrevious
 import it.vfsfitvnm.vimusic.utils.formatAsDuration
-import it.vfsfitvnm.vimusic.utils.rememberPreference
 import it.vfsfitvnm.vimusic.utils.secondary
 import it.vfsfitvnm.vimusic.utils.semiBold
-import it.vfsfitvnm.vimusic.utils.trackLoopEnabledKey
 import kotlinx.coroutines.flow.distinctUntilChanged
+import it.vfsfitvnm.vimusic.utils.positionAndDurationState
+import it.vfsfitvnm.vimusic.ui.styling.collapsedPlayerProgressBar
 
 @Composable
 fun Controls(
@@ -65,11 +67,8 @@ fun Controls(
     modifier: Modifier = Modifier
 ) {
     val (colorPalette, typography) = LocalAppearance.current
-
     val binder = LocalPlayerServiceBinder.current
     binder?.player ?: return
-
-    var trackLoopEnabled by rememberPreference(trackLoopEnabledKey, defaultValue = false)
 
     var scrubbingPosition by remember(mediaId) {
         mutableStateOf<Long?>(null)
@@ -83,42 +82,158 @@ fun Controls(
         Database.likedAt(mediaId).distinctUntilChanged().collect { likedAt = it }
     }
 
+    val positionAndDuration by binder.player.positionAndDurationState()
+
     val shouldBePlayingTransition = updateTransition(shouldBePlaying, label = "shouldBePlaying")
 
     val playPauseRoundness by shouldBePlayingTransition.animateDp(
         transitionSpec = { tween(durationMillis = 100, easing = LinearEasing) },
         label = "playPauseRoundness",
-        targetValueByState = { if (it) 32.dp else 16.dp }
+        targetValueByState = { if (it) 32.dp else 32.dp }
     )
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 32.dp)
+            .padding(horizontal = 29.dp) // Adjusted padding
     ) {
         Spacer(
             modifier = Modifier
                 .weight(1f)
         )
 
-        BasicText(
-            text = title ?: "",
-            style = typography.l.bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        BasicText(
-            text = artist ?: "",
-            style = typography.s.semiBold.secondary,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        Column(
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp) // Adjusted padding
+        ) {
+            BasicText(
+                text = title ?: "",
+                style = typography.l.bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            BasicText(
+                text = artist ?: "",
+                style = typography.s.semiBold.secondary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
 
         Spacer(
             modifier = Modifier
-                .weight(0.5f)
+                .height(16.dp)
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .padding(start = 18.dp)
+                    .clip(RoundedCornerShape(playPauseRoundness))
+                    .clickable {
+                        if (shouldBePlaying) {
+                            binder.player.pause()
+                        } else {
+                            if (binder.player.playbackState == Player.STATE_IDLE) {
+                                binder.player.prepare()
+                            }
+                            binder.player.play()
+                        }
+                    }
+                    .background(colorPalette.background2)
+                    .size(56.dp) // Adjusted size for play/pause button
+            ) {
+                Image(
+                    painter = painterResource(if (shouldBePlaying) R.drawable.pause else R.drawable.play),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(colorPalette.text),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(28.dp)
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .padding(start = 13.dp)
+                    .clip(RoundedCornerShape(playPauseRoundness))
+                    .clickable(onClick = binder.player::forceSeekToPrevious)
+                    .background(colorPalette.background2)
+                    .size(56.dp) // Adjusted size for buttons
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.play_skip_back),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(colorPalette.text),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(28.dp)
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .padding(start = 13.dp)
+                    .clip(RoundedCornerShape(playPauseRoundness))
+                    .clickable(onClick = binder.player::forceSeekToNext)
+                    .background(colorPalette.background2)
+                    .size(56.dp) // Adjusted size for buttons
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.play_skip_forward),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(colorPalette.text),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(28.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f)) // Spacer to push the like button to the right
+
+            Box(
+                modifier = Modifier
+                    .size(50.dp) // Adjusted size for the box
+                    .clickable {
+                        val currentMediaItem = binder.player.currentMediaItem
+                        query {
+                            if (Database.like(
+                                    mediaId,
+                                    if (likedAt == null) System.currentTimeMillis() else null
+                                ) == 0
+                            ) {
+                                currentMediaItem
+                                    ?.takeIf { it.mediaId == mediaId }
+                                    ?.let {
+                                        Database.insert(currentMediaItem, Song::toggleLike)
+                                    }
+                            }
+                        }
+                    }
+            ) {
+                Image(
+                    painter = painterResource(id = if (likedAt == null) R.drawable.heart_outline else R.drawable.heart),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(colorPalette.favoritesIcon),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(28.dp)
+                )
+            }
+        }
+
+
+        Spacer(
+            modifier = Modifier
+                .height(38.dp)
         )
 
         SeekBar(
@@ -141,138 +256,50 @@ fun Controls(
             },
             color = colorPalette.text,
             backgroundColor = colorPalette.background2,
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp) // Adjusted padding
         )
 
         Spacer(
             modifier = Modifier
-                .height(8.dp)
+                .height(18.dp)
         )
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
+                .padding(start = 20.dp, end = 20.dp) // Adjusted padding
                 .fillMaxWidth()
         ) {
-            BasicText(
-                text = formatAsDuration(scrubbingPosition ?: position),
-                style = typography.xxs.semiBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-
-            if (duration != C.TIME_UNSET) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
                 BasicText(
-                    text = formatAsDuration(duration),
+                    text = formatAsDuration(scrubbingPosition ?: position),
                     style = typography.xxs.semiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.align(Alignment.CenterStart)
                 )
             }
-        }
-
-        Spacer(
-            modifier = Modifier
-                .weight(1f)
-        )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            IconButton(
-                icon = if (likedAt == null) R.drawable.heart_outline else R.drawable.heart,
-                color = colorPalette.favoritesIcon,
-                onClick = {
-                    val currentMediaItem = binder.player.currentMediaItem
-                    query {
-                        if (Database.like(
-                                mediaId,
-                                if (likedAt == null) System.currentTimeMillis() else null
-                            ) == 0
-                        ) {
-                            currentMediaItem
-                                ?.takeIf { it.mediaId == mediaId }
-                                ?.let {
-                                    Database.insert(currentMediaItem, Song::toggleLike)
-                                }
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .size(24.dp)
-            )
-
-            IconButton(
-                icon = R.drawable.play_skip_back,
-                color = colorPalette.text,
-                onClick = binder.player::forceSeekToPrevious,
-                modifier = Modifier
-                    .weight(1f)
-                    .size(24.dp)
-            )
-
-            Spacer(
-                modifier = Modifier
-                    .width(8.dp)
-            )
 
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(playPauseRoundness))
-                    .clickable {
-                        if (shouldBePlaying) {
-                            binder.player.pause()
-                        } else {
-                            if (binder.player.playbackState == Player.STATE_IDLE) {
-                                binder.player.prepare()
-                            }
-                            binder.player.play()
-                        }
-                    }
-                    .background(colorPalette.background2)
-                    .size(64.dp)
+                    .weight(1f)
             ) {
-                Image(
-                    painter = painterResource(if (shouldBePlaying) R.drawable.pause else R.drawable.play),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(colorPalette.text),
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(28.dp)
-                )
+                if (duration != C.TIME_UNSET) {
+                    BasicText(
+                        text = formatAsDuration(duration),
+                        style = typography.xxs.semiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    )
+                }
             }
-
-            Spacer(
-                modifier = Modifier
-                    .width(8.dp)
-            )
-
-            IconButton(
-                icon = R.drawable.play_skip_forward,
-                color = colorPalette.text,
-                onClick = binder.player::forceSeekToNext,
-                modifier = Modifier
-                    .weight(1f)
-                    .size(24.dp)
-            )
-
-            IconButton(
-                icon = R.drawable.infinite,
-                color = if (trackLoopEnabled) colorPalette.text else colorPalette.textDisabled,
-                onClick = { trackLoopEnabled = !trackLoopEnabled },
-                modifier = Modifier
-                    .weight(1f)
-                    .size(24.dp)
-            )
         }
-
-        Spacer(
-            modifier = Modifier
-                .weight(1f)
-        )
     }
 }
