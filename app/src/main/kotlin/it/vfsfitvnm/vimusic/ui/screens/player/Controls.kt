@@ -54,7 +54,8 @@ import it.vfsfitvnm.vimusic.utils.secondary
 import it.vfsfitvnm.vimusic.utils.semiBold
 import kotlinx.coroutines.flow.distinctUntilChanged
 import it.vfsfitvnm.vimusic.utils.positionAndDurationState
-import it.vfsfitvnm.vimusic.ui.styling.collapsedPlayerProgressBar
+import it.vfsfitvnm.vimusic.utils.trackLoopEnabledKey
+import it.vfsfitvnm.vimusic.utils.rememberPreference
 
 @Composable
 fun Controls(
@@ -70,6 +71,8 @@ fun Controls(
     val binder = LocalPlayerServiceBinder.current
     binder?.player ?: return
 
+    var trackLoopEnabled by rememberPreference(trackLoopEnabledKey, defaultValue = false)
+
     var scrubbingPosition by remember(mediaId) {
         mutableStateOf<Long?>(null)
     }
@@ -81,8 +84,6 @@ fun Controls(
     LaunchedEffect(mediaId) {
         Database.likedAt(mediaId).distinctUntilChanged().collect { likedAt = it }
     }
-
-    val positionAndDuration by binder.player.positionAndDurationState()
 
     val shouldBePlayingTransition = updateTransition(shouldBePlaying, label = "shouldBePlaying")
 
@@ -201,7 +202,25 @@ fun Controls(
 
             Box(
                 modifier = Modifier
+                    .size(50.dp)
+                    .clickable { trackLoopEnabled = !trackLoopEnabled }
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.infinite),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(
+                        if (trackLoopEnabled) colorPalette.text else colorPalette.textDisabled
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(28.dp)
+                )
+            }
+
+            Box(
+                modifier = Modifier
                     .size(50.dp) // Adjusted size for the box
+                    .padding(end = 16.dp)
                     .clickable {
                         val currentMediaItem = binder.player.currentMediaItem
                         query {
@@ -233,7 +252,7 @@ fun Controls(
 
         Spacer(
             modifier = Modifier
-                .height(38.dp)
+                .height(18.dp)
         )
 
         SeekBar(
@@ -263,7 +282,7 @@ fun Controls(
 
         Spacer(
             modifier = Modifier
-                .height(18.dp)
+                .height(12.dp)
         )
 
         Row(
@@ -301,5 +320,9 @@ fun Controls(
                 }
             }
         }
+        Spacer(
+            modifier = Modifier
+                .height(24.dp)
+        )
     }
 }

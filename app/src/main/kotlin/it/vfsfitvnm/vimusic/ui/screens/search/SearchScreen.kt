@@ -63,10 +63,10 @@ fun SearchScreen(
                         enter = fadeIn(tween(300)),
                         exit = fadeOut(tween(300)),
                         modifier = Modifier
-                            .align(Alignment.CenterEnd)
+                            .align(Alignment.CenterStart)
                     ) {
                         BasicText(
-                            text = "Enter a name",
+                            text = "Search",
                             maxLines = 1,
                             style = LocalAppearance.current.typography.xxl.secondary
                         )
