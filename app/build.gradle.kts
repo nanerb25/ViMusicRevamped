@@ -9,10 +9,10 @@ android {
 
     defaultConfig {
         applicationId = "it.vfsfitvnm.vimusic"
-        minSdk = 21
+        minSdk = 33
         targetSdk = 33
         versionCode = 20
-        versionName = "0.5.4"
+        versionName = "0.5.8-beta"
     }
 
     splits {

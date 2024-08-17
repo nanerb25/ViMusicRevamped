@@ -7,7 +7,9 @@ data class MusicShelfRenderer(
     val bottomEndpoint: NavigationEndpoint?,
     val contents: List<Content>?,
     val continuations: List<Continuation>?,
-    val title: Runs?
+    val title: Runs?,
+    val thumbnail: ThumbnailRenderer?,
+    val subtitle: Runs?
 ) {
     @Serializable
     data class Content(
@@ -23,7 +25,7 @@ data class MusicShelfRenderer(
                 .orEmpty() to
                     musicResponsiveListItemRenderer
                         ?.flexColumns
-                        ?.let { it.getOrNull(1) ?: it.lastOrNull() }
+                        ?.getOrNull(1)
                         ?.musicResponsiveListItemFlexColumnRenderer
                         ?.text
                         ?.splitBySeparator()

@@ -42,6 +42,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import it.vfsfitvnm.compose.persist.persist
 import it.vfsfitvnm.compose.persist.persistList
@@ -138,7 +139,7 @@ fun OnlineSearch(
                         BasicTextField(
                             value = textFieldValue,
                             onValueChange = onTextFieldValueChanged,
-                            textStyle = typography.xxl.medium.align(TextAlign.End),
+                            textStyle = typography.xxl.medium.align(TextAlign.Start),
                             singleLine = true,
                             maxLines = 1,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -203,7 +204,7 @@ fun OnlineSearch(
 
                     BasicText(
                         text = searchQuery.query,
-                        style = typography.s.secondary,
+                        style = typography.s.copy(fontSize = 20.sp).secondary,
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
                             .weight(1f)
@@ -268,7 +269,7 @@ fun OnlineSearch(
 
                         BasicText(
                             text = suggestion,
-                            style = typography.s.secondary,
+                            style = typography.s.copy(fontSize = 20.sp).secondary,
                             modifier = Modifier
                                 .padding(horizontal = 8.dp)
                                 .weight(1f)
@@ -304,7 +305,7 @@ fun OnlineSearch(
                             .fillMaxSize()
                     ) {
                         BasicText(
-                            text = "An error has occurred.",
+                            text = "An error has occurred, Make sure you have an Internet Connection.",
                             style = typography.s.secondary.center,
                             modifier = Modifier
                                 .align(Alignment.Center)
