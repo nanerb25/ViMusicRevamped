@@ -37,7 +37,6 @@ import it.vfsfitvnm.vimusic.utils.pauseSearchHistoryKey
 import it.vfsfitvnm.vimusic.utils.preferences
 import it.vfsfitvnm.vimusic.utils.rememberPreference
 
-
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @Composable
@@ -119,48 +118,45 @@ fun HomeScreen(onPlaylistUrl: (String) -> Unit) {
                 onTopIconButtonClick = { settingsRoute() },
                 tabIndex = tabIndex,
                 onTabChanged = onTabChanged,
-                tabColumnContent = { item ->
-                    item(0, "Home", R.drawable.sparkles)
-                    item(1, "Songs", R.drawable.musical_notes)
-                    item(2, "Playlists", R.drawable.playlist)
-                    item(3, "Artists", R.drawable.person)
-                    item(4, "Albums", R.drawable.disc)
-                    item(5, "Settings", R.drawable.equalizer)
+                tabColumnContent = { Item ->
+                    Item(0, "Quick picks", R.drawable.sparkles)
+                    Item(1, "Songs", R.drawable.musical_notes)
+                    Item(2, "Playlists", R.drawable.playlist)
+                    Item(3, "Artists", R.drawable.person)
+                    Item(4, "Albums", R.drawable.disc)
                 }
-                ) { currentTabIndex ->
-                    saveableStateHolder.SaveableStateProvider(key = currentTabIndex) {
-                        when (currentTabIndex) {
-                            0 -> QuickPicks(
-                                onAlbumClick = { albumRoute(it) },
-                                onArtistClick = { artistRoute(it) },
-                                onPlaylistClick = { playlistRoute(it) },
-                                onSearchClick = { searchRoute("") }
-                            )
+            ) { currentTabIndex ->
+                saveableStateHolder.SaveableStateProvider(key = currentTabIndex) {
+                    when (currentTabIndex) {
+                        0 -> QuickPicks(
+                            onAlbumClick = { albumRoute(it) },
+                            onArtistClick = { artistRoute(it) },
+                            onPlaylistClick = { playlistRoute(it) },
+                            onSearchClick = { searchRoute("") }
+                        )
 
-                            1 -> HomeSongs(
-                                onSearchClick = { searchRoute("") }
-                            )
+                        1 -> HomeSongs(
+                            onSearchClick = { searchRoute("") }
+                        )
 
-                            2 -> HomePlaylists(
-                                onBuiltInPlaylist = { builtInPlaylistRoute(it) },
-                                onPlaylistClick = { localPlaylistRoute(it.id) },
-                                onSearchClick = { searchRoute("") }
-                            )
+                        2 -> HomePlaylists(
+                            onBuiltInPlaylist = { builtInPlaylistRoute(it) },
+                            onPlaylistClick = { localPlaylistRoute(it.id) },
+                            onSearchClick = { searchRoute("") }
+                        )
 
-                            3 -> HomeArtistList(
-                                onArtistClick = { artistRoute(it.id) },
-                                onSearchClick = { searchRoute("") }
-                            )
+                        3 -> HomeArtistList(
+                            onArtistClick = { artistRoute(it.id) },
+                            onSearchClick = { searchRoute("") }
+                        )
 
-                            4 -> HomeAlbums(
-                                onAlbumClick = { albumRoute(it.id) },
-                                onSearchClick = { searchRoute("") }
-                            )
-
-                            //5 -> settingsRoute()
-                        }
+                        4 -> HomeAlbums(
+                            onAlbumClick = { albumRoute(it.id) },
+                            onSearchClick = { searchRoute("") }
+                        )
                     }
                 }
+            }
         }
     }
 }

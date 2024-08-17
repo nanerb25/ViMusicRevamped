@@ -2,10 +2,7 @@ package it.vfsfitvnm.vimusic.ui.screens.player
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.tween
@@ -44,9 +41,6 @@ import it.vfsfitvnm.vimusic.ui.styling.LocalAppearance
 import it.vfsfitvnm.vimusic.ui.styling.px
 import it.vfsfitvnm.vimusic.utils.currentWindow
 import it.vfsfitvnm.vimusic.utils.DisposableListener
-import it.vfsfitvnm.vimusic.utils.forceSeekToNext
-import it.vfsfitvnm.vimusic.utils.forceSeekToPrevious
-import it.vfsfitvnm.vimusic.utils.onSwipe
 import it.vfsfitvnm.vimusic.utils.thumbnail
 import java.net.UnknownHostException
 import java.nio.channels.UnresolvedAddressException
@@ -96,16 +90,9 @@ fun Thumbnail(
     AnimatedContent(
         targetState = window,
         transitionSpec = {
-            if (initialState.mediaItem.mediaId == targetState.mediaItem.mediaId)
-                return@AnimatedContent ContentTransform(
-                    EnterTransition.None,
-                    ExitTransition.None
-                )
-
             val duration = 500
-            val slideDirection = if (targetState.firstPeriodIndex > initialState.firstPeriodIndex)
-                AnimatedContentScope.SlideDirection.Left
-            else AnimatedContentScope.SlideDirection.Right
+            val slideDirection =
+                if (targetState.firstPeriodIndex > initialState.firstPeriodIndex) AnimatedContentScope.SlideDirection.Left else AnimatedContentScope.SlideDirection.Right
 
             ContentTransform(
                 targetContentEnter = slideIntoContainer(
@@ -129,11 +116,6 @@ fun Thumbnail(
                 sizeTransform = SizeTransform(clip = false)
             )
         },
-        modifier = Modifier.onSwipe(
-            onSwipeLeft = binder.player::forceSeekToNext,
-            onSwipeRight = binder.player::forceSeekToPrevious
-        ),
-
         contentAlignment = Alignment.Center
     ) {currentWindow ->
         Box(

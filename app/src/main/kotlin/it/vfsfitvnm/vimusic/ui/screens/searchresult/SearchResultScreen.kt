@@ -88,8 +88,8 @@ fun SearchResultScreen(query: String, onSearchAgain: () -> Unit) {
                     Item(2, "Artists", R.drawable.person)
                     Item(3, "Videos", R.drawable.film)
                     Item(4, "Playlists", R.drawable.playlist)
-                },
-            content = { tabIndex ->
+                }
+            ) { tabIndex ->
                 saveableStateHolder.SaveableStateProvider(tabIndex) {
                     when (tabIndex) {
                         0 -> {
@@ -309,7 +309,6 @@ fun SearchResultScreen(query: String, onSearchAgain: () -> Unit) {
                     }
                 }
             }
-            )
         }
     }
 }

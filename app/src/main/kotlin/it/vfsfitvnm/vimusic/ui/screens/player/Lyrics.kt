@@ -46,7 +46,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.media3.common.C
 import androidx.media3.common.MediaMetadata
 import com.valentinilk.shimmer.shimmer
@@ -286,7 +285,7 @@ fun Lyrics(
                         itemsIndexed(items = synchronizedLyrics.sentences) { index, sentence ->
                             BasicText(
                                 text = sentence.second,
-                                style = typography.xs.copy(fontSize = 21.sp).center.medium.color(if (index == synchronizedLyrics.index) PureBlackColorPalette.text else PureBlackColorPalette.textDisabled),
+                                style = typography.xs.center.medium.color(if (index == synchronizedLyrics.index) PureBlackColorPalette.text else PureBlackColorPalette.textDisabled),
                                 modifier = Modifier
                                     .padding(vertical = 4.dp, horizontal = 32.dp)
                             )

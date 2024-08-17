@@ -35,8 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,19 +75,17 @@ import it.vfsfitvnm.vimusic.utils.semiBold
 import it.vfsfitvnm.vimusic.utils.shouldBePlaying
 import it.vfsfitvnm.vimusic.utils.thumbnail
 import it.vfsfitvnm.vimusic.utils.toast
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
 import kotlin.math.absoluteValue
 import it.vfsfitvnm.vimusic.ui.components.SeekBar
+import androidx.activity.OnBackPressedCallback
 
 @ExperimentalFoundationApi
 @ExperimentalAnimationApi
 @Composable
 fun Player(
     layoutState: BottomSheetState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-
     val menuState = LocalMenuState.current
     val (colorPalette, typography, thumbnailShape) = LocalAppearance.current
     val binder = LocalPlayerServiceBinder.current
@@ -166,7 +162,6 @@ fun Player(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .height(Dimensions.collapsedPlayer)
-                        .padding(start = 16.dp)
                 ){
                     AsyncImage(
                         model = mediaItem.mediaMetadata.artworkUri.thumbnail(Dimensions.thumbnails.song.px),
@@ -212,7 +207,6 @@ fun Player(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .height(Dimensions.collapsedPlayer)
-                        .padding(end = 16.dp)
                 ) {
                     IconButton(
                         icon = if (shouldBePlaying) R.drawable.pause else R.drawable.play,
@@ -307,7 +301,7 @@ fun Player(
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .weight(0.55f)
+                        .weight(0.66f)
                         .padding(bottom = 16.dp)
                 ) {
                     thumbnailContent(
@@ -333,34 +327,8 @@ fun Player(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = containerModifier
-                    .padding(top = 32.dp)
+                    .padding(top = 240.dp)
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = modifier
-                        .padding(bottom = 100.dp)
-                        .fillMaxWidth()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(78.dp)
-                            .align(Alignment.Start) // Align chevron to top left
-                            .padding(start = 24.dp, top = 24.dp)
-                            .clickable {
-                                layoutState.collapseSoft()
-                            }
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.chevron_down),
-                            contentDescription = null,
-                            colorFilter = ColorFilter.tint(colorPalette.text),
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .size(28.dp)
-                        )
-                    }
-                }
-
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -369,7 +337,6 @@ fun Player(
                     thumbnailContent(
                         modifier = Modifier
                             .padding(horizontal = 24.dp, vertical = 8.dp)
-                            .size(560.dp)
                     )
                 }
 
@@ -383,7 +350,7 @@ fun Player(
                             .fillMaxWidth()
                             .align(Alignment.Start)
                     )
-                    Spacer(modifier = Modifier.height(26.dp))
+                    Spacer(modifier = Modifier.height(18.dp))
                 }
             }
         }
@@ -428,7 +395,6 @@ fun Player(
         )
     }
 }
-
 
 @ExperimentalAnimationApi
 @Composable

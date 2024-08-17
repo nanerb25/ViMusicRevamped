@@ -134,6 +134,14 @@ class MainActivity : ComponentActivity(), PersistMapOwner {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (BuildCompat.isAtLeastT()) {
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                OnBackInvokedDispatcher.PRIORITY_DEFAULT
+            ) {
+                Log.d("onBackPress", "does it work?")
+            }
+        }
+
         @Suppress("DEPRECATION", "UNCHECKED_CAST")
         persistMap = lastCustomNonConfigurationInstance as? PersistMap ?: PersistMap()
 

@@ -152,14 +152,9 @@ fun QuickPicks(
                 )
         ) {
             Header(
-                title = "Home",
+                title = "Quick picks",
                 modifier = Modifier
-                    .padding(end = 18.dp)
-            )
-            BasicText(
-                text = "Quick picks",
-                style = typography.m.semiBold,
-                modifier = sectionTextModifier
+                    .padding(endPaddingValues)
             )
 
             relatedPageResult?.getOrNull()?.let { related ->

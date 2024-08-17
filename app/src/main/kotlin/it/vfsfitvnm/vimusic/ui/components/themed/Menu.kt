@@ -38,7 +38,7 @@ inline fun Menu(
             .padding(top = 48.dp)
             .verticalScroll(rememberScrollState())
             .fillMaxWidth()
-            .background(colorPalette.background0)
+            .background(colorPalette.background1)
             .padding(top = 2.dp)
             .padding(vertical = 8.dp)
             .navigationBarsPadding(),
